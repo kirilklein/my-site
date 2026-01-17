@@ -62,14 +62,12 @@ export default function CRTTerminal() {
     // Check if we've completed all lines
     if (visibleLines > terminalSequence.length) {
       if (!typingComplete) {
-        console.log("Typing complete!");
         setTypingComplete(true);
       }
       return;
     }
 
     const currentLine = terminalSequence[visibleLines - 1];
-    console.log("Typing:", { visibleLines, typedChars, lineLength: currentLine.text.length, currentLineComplete });
 
     if (typedChars < currentLine.text.length) {
       const typeSpeed = currentLine.type === "title" ? 80 :
@@ -81,7 +79,6 @@ export default function CRTTerminal() {
 
       return () => clearTimeout(typeTimer);
     } else if (!currentLineComplete && !transitionTimerRef.current) {
-      console.log("Line complete, moving to next...");
       setCurrentLineComplete(true);
       transitionTimerRef.current = setTimeout(() => {
         transitionTimerRef.current = null;
@@ -95,7 +92,6 @@ export default function CRTTerminal() {
   // Transition to loading phase after typing completes
   useEffect(() => {
     if (typingComplete && phase === "typing") {
-      console.log("Transitioning to loading...");
       const transitionTimer = setTimeout(() => {
         setPhase("loading");
       }, 800);
@@ -186,14 +182,6 @@ export default function CRTTerminal() {
                           {">"} <span className="cursor-blink">▊</span>
                         </div>
                       )}
-
-                      {/* Skip button for testing */}
-                      <button
-                        onClick={() => setPhase("network")}
-                        className="absolute bottom-4 right-4 text-green-400/50 text-xs hover:text-green-400"
-                      >
-                        [skip →]
-                      </button>
                     </>
                   )}
 
