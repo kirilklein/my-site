@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect } from "react";
 import CRTTerminal from "@/components/CRTTerminal";
 import AboutSection from "@/components/AboutSection";
 import ProjectsSection from "@/components/ProjectsSection";
@@ -5,6 +8,10 @@ import ContactSection from "@/components/ContactSection";
 import Navigation from "@/components/Navigation";
 
 export default function Home() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
