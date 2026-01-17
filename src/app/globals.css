@@ -4,6 +4,9 @@
   --background: #0a0a0a;
   --foreground: #00ff00;
   --green-glow: #00ff00;
+  --monitor-dark: #1a1a1a;
+  --monitor-mid: #2a2a2a;
+  --monitor-light: #3a3a3a;
 }
 
 @theme inline {
@@ -19,51 +22,257 @@ body {
   font-family: var(--font-mono), monospace;
 }
 
-/* CRT Scanlines */
-.scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-}
+/* ============================================
+   CRT MONITOR STYLING
+   ============================================ */
 
-/* Screen phosphor glow */
-.screen-glow {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 255, 0, 0.03) 0%,
-    transparent 70%
+/* Monitor outer shell */
+.monitor-shell {
+  background: linear-gradient(
+    180deg,
+    #3d3d3d 0%,
+    #2d2d2d 10%,
+    #252525 50%,
+    #1d1d1d 90%,
+    #151515 100%
   );
-}
-
-/* CRT screen curvature illusion */
-.crt-inner {
+  border-radius: 20px;
+  padding: 8px;
   box-shadow:
-    inset 0 0 100px rgba(0, 255, 0, 0.05),
-    inset 0 0 20px rgba(0, 0, 0, 0.5);
+    0 30px 60px -15px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* CRT bezel styling */
+/* CRT bezel - the frame around the screen */
 .crt-bezel {
   background: linear-gradient(
     145deg,
-    #3f3f46 0%,
-    #27272a 50%,
-    #18181b 100%
+    #404040 0%,
+    #2a2a2a 30%,
+    #1f1f1f 70%,
+    #181818 100%
   );
+  border-radius: 16px;
+  padding: 16px;
   box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 2px 4px rgba(255, 255, 255, 0.05),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
+
+/* Inner bezel edge - creates depth */
+.bezel-inner {
+  background: linear-gradient(
+    145deg,
+    #1a1a1a 0%,
+    #0f0f0f 50%,
+    #0a0a0a 100%
+  );
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    inset 0 0 3px rgba(0, 0, 0, 0.9);
+}
+
+/* Screen container */
+.crt-screen-container {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* The curved glass screen */
+.crt-glass {
+  position: relative;
+  background: #0a0a0a;
+  border-radius: 6px;
+  overflow: hidden;
+  /* Subtle barrel distortion effect */
+  transform: perspective(1000px) rotateX(1deg);
+  box-shadow:
+    inset 0 0 80px rgba(0, 255, 0, 0.03),
+    inset 0 0 2px rgba(0, 255, 0, 0.1);
+}
+
+.crt-glass.powered-off {
+  background: #050505;
+}
+
+.crt-glass.powered-off .terminal-content,
+.crt-glass.powered-off .phosphor-glow,
+.crt-glass.powered-off .scanlines {
+  opacity: 0;
+}
+
+/* Scanlines overlay */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.3) 1px,
+    rgba(0, 0, 0, 0.3) 2px
+  );
+  animation: scanline-move 10s linear infinite;
+}
+
+@keyframes scanline-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* Screen vignette - darker edges */
+.screen-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+}
+
+/* Screen glare/reflection */
+.screen-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+}
+
+/* Phosphor glow */
+.phosphor-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 0, 0.05) 0%,
+    rgba(0, 255, 0, 0.02) 40%,
+    transparent 70%
+  );
+  animation: phosphor-pulse 4s ease-in-out infinite;
+}
+
+@keyframes phosphor-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Terminal content area */
+.terminal-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* Terminal text glow */
+.terminal-text {
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 8px currentColor,
+    0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+/* Monitor bottom panel */
+.monitor-bottom-panel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 16px;
+  margin-top: 8px;
+  background: linear-gradient(180deg, #252525 0%, #1d1d1d 100%);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Power LED */
+.power-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #333;
+}
+
+.power-led.led-on {
+  background: #00ff00;
+  box-shadow:
+    0 0 6px #00ff00,
+    0 0 12px #00ff00,
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.power-led.led-off {
+  background: #1a3a1a;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Monitor stand */
+.monitor-stand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -4px;
+}
+
+.stand-neck {
+  width: 60px;
+  height: 30px;
+  background: linear-gradient(
+    90deg,
+    #1a1a1a 0%,
+    #2a2a2a 30%,
+    #2a2a2a 70%,
+    #1a1a1a 100%
+  );
+  border-radius: 0 0 8px 8px;
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stand-base {
+  width: 140px;
+  height: 12px;
+  background: linear-gradient(
+    180deg,
+    #2a2a2a 0%,
+    #1a1a1a 50%,
+    #0f0f0f 100%
+  );
+  border-radius: 0 0 20px 20px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   CURSOR AND TEXT EFFECTS
+   ============================================ */
 
 /* Blinking cursor */
 .cursor-blink {
   animation: blink 1s step-end infinite;
   color: #00ff00;
-  text-shadow: 0 0 10px #00ff00;
+  text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
 }
 
 @keyframes blink {
@@ -81,16 +290,22 @@ body {
 }
 
 /* Subtle screen flicker */
-.crt-screen {
-  animation: flicker 0.15s infinite;
+.crt-monitor {
+  animation: flicker 8s infinite;
 }
 
 @keyframes flicker {
   0%, 100% { opacity: 1; }
-  92% { opacity: 1; }
-  93% { opacity: 0.98; }
-  94% { opacity: 1; }
+  97% { opacity: 1; }
+  97.5% { opacity: 0.97; }
+  98% { opacity: 1; }
+  98.5% { opacity: 0.98; }
+  99% { opacity: 1; }
 }
+
+/* ============================================
+   PAGE LAYOUT
+   ============================================ */
 
 /* Smooth scroll for page sections */
 html {

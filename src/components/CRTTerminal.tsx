@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface TerminalLine {
   text: string;
@@ -23,26 +23,25 @@ export default function CRTTerminal() {
   const [visibleLines, setVisibleLines] = useState<number>(0);
   const [typedChars, setTypedChars] = useState<number>(0);
   const [currentLineComplete, setCurrentLineComplete] = useState(false);
+  const hasStarted = useRef(false);
 
+  // Start the sequence only once
   useEffect(() => {
-    if (visibleLines >= terminalSequence.length) return;
+    if (hasStarted.current) return;
+    hasStarted.current = true;
 
-    const currentLine = terminalSequence[visibleLines];
-    const lineDelay = visibleLines === 0 ? currentLine.delay :
-      currentLine.delay - terminalSequence[visibleLines - 1].delay;
+    const startTimer = setTimeout(() => {
+      setVisibleLines(1);
+    }, 500);
 
-    const showLineTimer = setTimeout(() => {
-      setTypedChars(0);
-      setCurrentLineComplete(false);
-    }, lineDelay);
+    return () => clearTimeout(startTimer);
+  }, []);
 
-    return () => clearTimeout(showLineTimer);
-  }, [visibleLines]);
-
+  // Handle typing animation for current line
   useEffect(() => {
-    if (visibleLines >= terminalSequence.length) return;
+    if (visibleLines === 0 || visibleLines > terminalSequence.length) return;
 
-    const currentLine = terminalSequence[visibleLines];
+    const currentLine = terminalSequence[visibleLines - 1];
 
     if (typedChars < currentLine.text.length) {
       const typeSpeed = currentLine.type === "title" ? 80 :
@@ -56,19 +55,13 @@ export default function CRTTerminal() {
     } else if (!currentLineComplete) {
       setCurrentLineComplete(true);
       const nextLineTimer = setTimeout(() => {
+        setTypedChars(0);
+        setCurrentLineComplete(false);
         setVisibleLines(prev => prev + 1);
-      }, 200);
+      }, 300);
       return () => clearTimeout(nextLineTimer);
     }
   }, [typedChars, visibleLines, currentLineComplete]);
-
-  // Start the sequence
-  useEffect(() => {
-    const startTimer = setTimeout(() => {
-      setVisibleLines(1);
-    }, terminalSequence[0].delay);
-    return () => clearTimeout(startTimer);
-  }, []);
 
   const getLineStyle = (type: TerminalLine["type"]) => {
     switch (type) {
@@ -84,51 +77,69 @@ export default function CRTTerminal() {
   };
 
   return (
-    <div className="crt-screen relative w-full max-w-3xl mx-auto">
-      {/* CRT screen bezel */}
-      <div className="crt-bezel bg-zinc-800 rounded-2xl p-3 shadow-2xl">
-        {/* Inner screen with curve effect */}
-        <div className="crt-inner relative bg-black rounded-lg overflow-hidden">
-          {/* Scanlines overlay */}
-          <div className="scanlines absolute inset-0 pointer-events-none z-10" />
+    <div className="crt-monitor relative w-full max-w-3xl mx-auto">
+      {/* Monitor outer shell */}
+      <div className="monitor-shell relative">
+        {/* CRT bezel */}
+        <div className="crt-bezel relative">
+          {/* Inner bezel edge */}
+          <div className="bezel-inner">
+            {/* Screen container with curvature */}
+            <div className="crt-screen-container">
+              {/* The curved glass */}
+              <div className="crt-glass">
+                {/* Scanlines overlay */}
+                <div className="scanlines" />
 
-          {/* Screen glow */}
-          <div className="screen-glow absolute inset-0 pointer-events-none" />
+                {/* Screen vignette */}
+                <div className="screen-vignette" />
 
-          {/* Terminal content */}
-          <div className="relative z-0 p-8 md:p-12 min-h-[400px] md:min-h-[500px] font-mono">
-            {terminalSequence.slice(0, visibleLines).map((line, index) => {
-              const isCurrentLine = index === visibleLines - 1;
-              const displayText = isCurrentLine
-                ? line.text.slice(0, typedChars)
-                : line.text;
+                {/* Screen reflection/glare */}
+                <div className="screen-glare" />
 
-              return (
-                <div key={index} className={`${getLineStyle(line.type)} leading-relaxed`}>
-                  {displayText}
-                  {isCurrentLine && !currentLineComplete && (
-                    <span className="cursor-blink">▊</span>
+                {/* Phosphor glow */}
+                <div className="phosphor-glow" />
+
+                {/* Terminal content */}
+                <div className="terminal-content relative z-10 p-6 md:p-10 min-h-[350px] md:min-h-[450px] font-mono">
+                  {/* Completed lines */}
+                  {terminalSequence.slice(0, visibleLines - 1).map((line, index) => (
+                    <div key={index} className={`${getLineStyle(line.type)} leading-relaxed terminal-text`}>
+                      {line.text}
+                    </div>
+                  ))}
+
+                  {/* Currently typing line */}
+                  {visibleLines > 0 && visibleLines <= terminalSequence.length && (
+                    <div className={`${getLineStyle(terminalSequence[visibleLines - 1].type)} leading-relaxed terminal-text`}>
+                      {terminalSequence[visibleLines - 1].text.slice(0, typedChars)}
+                      {!currentLineComplete && <span className="cursor-blink">▊</span>}
+                    </div>
+                  )}
+
+                  {/* Final cursor after sequence complete */}
+                  {visibleLines > terminalSequence.length && (
+                    <div className="text-green-400 mt-6 terminal-text">
+                      {">"} <span className="cursor-blink">▊</span>
+                    </div>
                   )}
                 </div>
-              );
-            })}
-
-            {/* Final cursor after sequence complete */}
-            {visibleLines >= terminalSequence.length && (
-              <div className="text-green-400 mt-6">
-                {">"} <span className="cursor-blink">▊</span>
               </div>
-            )}
+            </div>
           </div>
+        </div>
+
+        {/* Monitor bottom panel */}
+        <div className="monitor-bottom-panel">
+          {/* Power LED */}
+          <div className="power-led led-on" />
         </div>
       </div>
 
-      {/* CRT stand/base */}
-      <div className="flex justify-center mt-2">
-        <div className="w-32 h-3 bg-zinc-700 rounded-b-lg" />
-      </div>
-      <div className="flex justify-center">
-        <div className="w-48 h-2 bg-zinc-800 rounded-b-lg" />
+      {/* Monitor stand */}
+      <div className="monitor-stand">
+        <div className="stand-neck" />
+        <div className="stand-base" />
       </div>
     </div>
   );
