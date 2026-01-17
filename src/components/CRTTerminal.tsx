@@ -1,28 +1,37 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import the 3D component to avoid SSR issues
+const NeuralNetwork3D = dynamic(() => import("./NeuralNetwork3D"), {
+  ssr: false,
+});
 
 interface TerminalLine {
   text: string;
   type: "command" | "output" | "title" | "subtitle";
-  delay: number;
 }
 
 const terminalSequence: TerminalLine[] = [
-  { text: "> initializing system...", type: "command", delay: 0 },
-  { text: "[OK] kernel loaded", type: "output", delay: 800 },
-  { text: "> loading neural_network.weights", type: "command", delay: 1200 },
-  { text: "[OK] model ready", type: "output", delay: 2000 },
-  { text: "> whoami", type: "command", delay: 2600 },
-  { text: "", type: "output", delay: 3000 },
-  { text: "KIRIL KLEIN", type: "title", delay: 3100 },
-  { text: "ML Engineer & Data Scientist", type: "subtitle", delay: 3800 },
+  { text: "> initializing system...", type: "command" },
+  { text: "[OK] kernel loaded", type: "output" },
+  { text: "> loading neural_network.weights", type: "command" },
+  { text: "[OK] model ready", type: "output" },
+  { text: "> whoami", type: "command" },
+  { text: "", type: "output" },
+  { text: "KIRIL KLEIN", type: "title" },
+  { text: "ML Engineer & Data Scientist", type: "subtitle" },
 ];
+
+type Phase = "typing" | "loading" | "network";
 
 export default function CRTTerminal() {
   const [visibleLines, setVisibleLines] = useState<number>(0);
   const [typedChars, setTypedChars] = useState<number>(0);
   const [currentLineComplete, setCurrentLineComplete] = useState(false);
+  const [phase, setPhase] = useState<Phase>("typing");
+  const [loadProgress, setLoadProgress] = useState(0);
   const hasStarted = useRef(false);
 
   // Start the sequence only once
@@ -39,6 +48,7 @@ export default function CRTTerminal() {
 
   // Handle typing animation for current line
   useEffect(() => {
+    if (phase !== "typing") return;
     if (visibleLines === 0 || visibleLines > terminalSequence.length) return;
 
     const currentLine = terminalSequence[visibleLines - 1];
@@ -61,7 +71,38 @@ export default function CRTTerminal() {
       }, 300);
       return () => clearTimeout(nextLineTimer);
     }
-  }, [typedChars, visibleLines, currentLineComplete]);
+  }, [typedChars, visibleLines, currentLineComplete, phase]);
+
+  // Transition to loading phase after typing completes
+  useEffect(() => {
+    if (visibleLines > terminalSequence.length && phase === "typing") {
+      const transitionTimer = setTimeout(() => {
+        setPhase("loading");
+      }, 800);
+      return () => clearTimeout(transitionTimer);
+    }
+  }, [visibleLines, phase]);
+
+  // Loading bar animation
+  useEffect(() => {
+    if (phase !== "loading") return;
+
+    if (loadProgress < 100) {
+      const loadTimer = setTimeout(() => {
+        // Variable speed loading
+        const increment = loadProgress < 30 ? 3 :
+                         loadProgress < 70 ? 2 :
+                         loadProgress < 90 ? 4 : 6;
+        setLoadProgress(prev => Math.min(prev + increment, 100));
+      }, 50);
+      return () => clearTimeout(loadTimer);
+    } else {
+      const networkTimer = setTimeout(() => {
+        setPhase("network");
+      }, 500);
+      return () => clearTimeout(networkTimer);
+    }
+  }, [phase, loadProgress]);
 
   const getLineStyle = (type: TerminalLine["type"]) => {
     switch (type) {
@@ -102,25 +143,61 @@ export default function CRTTerminal() {
 
                 {/* Terminal content */}
                 <div className="terminal-content relative z-10 p-6 md:p-10 min-h-[350px] md:min-h-[450px] font-mono">
-                  {/* Completed lines */}
-                  {terminalSequence.slice(0, visibleLines - 1).map((line, index) => (
-                    <div key={index} className={`${getLineStyle(line.type)} leading-relaxed terminal-text`}>
-                      {line.text}
-                    </div>
-                  ))}
+                  {phase === "typing" && (
+                    <>
+                      {/* Completed lines */}
+                      {terminalSequence.slice(0, visibleLines - 1).map((line, index) => (
+                        <div key={index} className={`${getLineStyle(line.type)} leading-relaxed terminal-text`}>
+                          {line.text}
+                        </div>
+                      ))}
 
-                  {/* Currently typing line */}
-                  {visibleLines > 0 && visibleLines <= terminalSequence.length && (
-                    <div className={`${getLineStyle(terminalSequence[visibleLines - 1].type)} leading-relaxed terminal-text`}>
-                      {terminalSequence[visibleLines - 1].text.slice(0, typedChars)}
-                      {!currentLineComplete && <span className="cursor-blink">▊</span>}
+                      {/* Currently typing line */}
+                      {visibleLines > 0 && visibleLines <= terminalSequence.length && (
+                        <div className={`${getLineStyle(terminalSequence[visibleLines - 1].type)} leading-relaxed terminal-text`}>
+                          {terminalSequence[visibleLines - 1].text.slice(0, typedChars)}
+                          {!currentLineComplete && <span className="cursor-blink">▊</span>}
+                        </div>
+                      )}
+
+                      {/* Final cursor after sequence complete */}
+                      {visibleLines > terminalSequence.length && (
+                        <div className="text-green-400 mt-6 terminal-text">
+                          {">"} <span className="cursor-blink">▊</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {phase === "loading" && (
+                    <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
+                      <div className="text-green-400 terminal-text mb-4">
+                        {">"} visualizing neural network...
+                      </div>
+
+                      {/* Loading bar container */}
+                      <div className="w-full max-w-md">
+                        <div className="loading-bar-container">
+                          <div
+                            className="loading-bar-fill"
+                            style={{ width: `${loadProgress}%` }}
+                          />
+                        </div>
+                        <div className="text-green-400/70 text-sm mt-2 text-center font-mono">
+                          {loadProgress}%
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {/* Final cursor after sequence complete */}
-                  {visibleLines > terminalSequence.length && (
-                    <div className="text-green-400 mt-6 terminal-text">
-                      {">"} <span className="cursor-blink">▊</span>
+                  {phase === "network" && (
+                    <div className="network-view">
+                      <NeuralNetwork3D />
+                      <div className="network-label">
+                        <span className="text-green-400/60 text-xs font-mono">
+                          neural_network.visualization active
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>

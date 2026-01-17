@@ -265,6 +265,85 @@ body {
 }
 
 /* ============================================
+   LOADING BAR
+   ============================================ */
+
+.loading-bar-container {
+  height: 20px;
+  background: #0a0a0a;
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  padding: 3px;
+  box-shadow:
+    0 0 10px rgba(0, 255, 0, 0.2),
+    inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #00aa00 0%,
+    #00ff00 50%,
+    #00aa00 100%
+  );
+  border-radius: 2px;
+  transition: width 0.05s linear;
+  box-shadow:
+    0 0 10px #00ff00,
+    0 0 20px rgba(0, 255, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: loading-shine 1s linear infinite;
+}
+
+@keyframes loading-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ============================================
+   NEURAL NETWORK VIEW
+   ============================================ */
+
+.network-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+
+.neural-network-container {
+  width: 100%;
+  height: 320px;
+  border-radius: 4px;
+}
+
+.network-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 8px;
+}
+
+/* ============================================
    CURSOR AND TEXT EFFECTS
    ============================================ */
 
