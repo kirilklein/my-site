@@ -32,26 +32,44 @@ export default function CRTTerminal() {
   const [currentLineComplete, setCurrentLineComplete] = useState(false);
   const [phase, setPhase] = useState<Phase>("typing");
   const [loadProgress, setLoadProgress] = useState(0);
-  const hasStarted = useRef(false);
+  const [typingComplete, setTypingComplete] = useState(false);
+  const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Start the sequence only once
+  // Cleanup on unmount
   useEffect(() => {
-    if (hasStarted.current) return;
-    hasStarted.current = true;
-
-    const startTimer = setTimeout(() => {
-      setVisibleLines(1);
-    }, 500);
-
-    return () => clearTimeout(startTimer);
+    return () => {
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current);
+      }
+    };
   }, []);
+
+  // Start the sequence after mount
+  useEffect(() => {
+    if (visibleLines === 0 && phase === "typing") {
+      const startTimer = setTimeout(() => {
+        setVisibleLines(1);
+      }, 500);
+      return () => clearTimeout(startTimer);
+    }
+  }, [visibleLines, phase]);
 
   // Handle typing animation for current line
   useEffect(() => {
     if (phase !== "typing") return;
-    if (visibleLines === 0 || visibleLines > terminalSequence.length) return;
+    if (visibleLines === 0) return;
+
+    // Check if we've completed all lines
+    if (visibleLines > terminalSequence.length) {
+      if (!typingComplete) {
+        console.log("Typing complete!");
+        setTypingComplete(true);
+      }
+      return;
+    }
 
     const currentLine = terminalSequence[visibleLines - 1];
+    console.log("Typing:", { visibleLines, typedChars, lineLength: currentLine.text.length, currentLineComplete });
 
     if (typedChars < currentLine.text.length) {
       const typeSpeed = currentLine.type === "title" ? 80 :
@@ -62,26 +80,28 @@ export default function CRTTerminal() {
       }, typeSpeed);
 
       return () => clearTimeout(typeTimer);
-    } else if (!currentLineComplete) {
+    } else if (!currentLineComplete && !transitionTimerRef.current) {
+      console.log("Line complete, moving to next...");
       setCurrentLineComplete(true);
-      const nextLineTimer = setTimeout(() => {
+      transitionTimerRef.current = setTimeout(() => {
+        transitionTimerRef.current = null;
         setTypedChars(0);
         setCurrentLineComplete(false);
         setVisibleLines(prev => prev + 1);
       }, 300);
-      return () => clearTimeout(nextLineTimer);
     }
-  }, [typedChars, visibleLines, currentLineComplete, phase]);
+  }, [typedChars, visibleLines, currentLineComplete, phase, typingComplete]);
 
   // Transition to loading phase after typing completes
   useEffect(() => {
-    if (visibleLines > terminalSequence.length && phase === "typing") {
+    if (typingComplete && phase === "typing") {
+      console.log("Transitioning to loading...");
       const transitionTimer = setTimeout(() => {
         setPhase("loading");
       }, 800);
       return () => clearTimeout(transitionTimer);
     }
-  }, [visibleLines, phase]);
+  }, [typingComplete, phase]);
 
   // Loading bar animation
   useEffect(() => {
@@ -166,6 +186,14 @@ export default function CRTTerminal() {
                           {">"} <span className="cursor-blink">▊</span>
                         </div>
                       )}
+
+                      {/* Skip button for testing */}
+                      <button
+                        onClick={() => setPhase("network")}
+                        className="absolute bottom-4 right-4 text-green-400/50 text-xs hover:text-green-400"
+                      >
+                        [skip →]
+                      </button>
                     </>
                   )}
 
