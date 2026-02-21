@@ -43,6 +43,29 @@ body {
   mask-image: radial-gradient(circle at center, black 45%, transparent 92%);
 }
 
+.hero-cinematic-beam {
+  position: absolute;
+  inset: -30% -10% auto -20%;
+  height: 70%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(153, 255, 209, 0.14) 0%,
+    rgba(153, 255, 209, 0.05) 24%,
+    rgba(153, 255, 209, 0) 54%
+  );
+  filter: blur(2px);
+  transform: rotate(-5deg);
+  animation: hero-beam-sweep 6s ease-in-out infinite;
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 46%, rgba(0, 0, 0, 0.55) 100%);
+}
+
 .hero-chip {
   display: inline-block;
   padding: 0.5rem 0.75rem;
@@ -60,6 +83,24 @@ body {
 
 .hero-subtitle {
   text-wrap: balance;
+}
+
+.hero-reveal-chip {
+  animation: hero-chip-in 0.9s cubic-bezier(.19,.77,.17,.99) both;
+}
+
+.hero-reveal-title {
+  animation: hero-title-in 1.05s cubic-bezier(.15,.78,.2,.99) 0.08s both;
+  will-change: transform, opacity;
+}
+
+.hero-reveal-subtitle {
+  animation: hero-subtitle-in 1.05s cubic-bezier(.16,.75,.25,.98) 0.25s both;
+  will-change: transform, opacity;
+}
+
+.hero-reveal-actions {
+  animation: hero-subtitle-in 0.95s cubic-bezier(.16,.75,.25,.98) 0.42s both;
 }
 
 .hero-cta {
@@ -95,6 +136,51 @@ body {
 .hero-cta-secondary:hover {
   color: #e4e4e7;
   border-color: rgba(74, 222, 128, 0.55);
+}
+
+.lab-scroll-section {
+  background:
+    radial-gradient(circle at 50% 10%, rgba(22, 163, 74, 0.14), transparent 36%),
+    linear-gradient(180deg, #060606 0%, #0b0b0b 50%, #050505 100%);
+}
+
+.lab-sticky-stage {
+  display: flex;
+  align-items: center;
+}
+
+.lab-monitor-wrap {
+  transform-origin: center top;
+}
+
+@keyframes hero-beam-sweep {
+  0%, 100% { transform: translateX(0) rotate(-5deg); opacity: 0.45; }
+  50% { transform: translateX(2.5%) rotate(-4deg); opacity: 0.8; }
+}
+
+@keyframes hero-chip-in {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-title-in {
+  0% { opacity: 0; transform: translateY(26px) scale(1.02); filter: blur(2px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes hero-subtitle-in {
+  0% { opacity: 0; transform: translateY(22px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cinematic-beam,
+  .hero-reveal-chip,
+  .hero-reveal-title,
+  .hero-reveal-subtitle,
+  .hero-reveal-actions {
+    animation: none;
+  }
 }
 
 /* ============================================
