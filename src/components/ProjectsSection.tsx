@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 interface Project {
   name: string;
@@ -112,29 +113,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 export default function ProjectsSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const { ref, isInView, progress } = useScrollReveal<HTMLElement>({ threshold: 0.1 });
 
   return (
     <section
-      ref={sectionRef}
+      ref={ref}
       id="projects"
       className="min-h-screen flex items-center justify-center px-4 py-20"
     >
@@ -142,8 +125,9 @@ export default function ProjectsSection() {
         {/* Section header */}
         <div
           className={`mb-12 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
+          style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
         >
           <div className="text-green-400 font-mono mb-2">
             <span className="text-green-500">$</span> ls -la ~/projects/
@@ -152,7 +136,7 @@ export default function ProjectsSection() {
             Projects
           </h2>
           <p className="text-zinc-500 mt-2 font-mono text-sm">
-            // selected works and experiments
+            selected works and experiments
           </p>
         </div>
 
@@ -166,11 +150,11 @@ export default function ProjectsSection() {
         {/* More projects hint */}
         <div
           className={`mt-8 text-center transition-all duration-700 delay-500 ${
-            isVisible ? "opacity-100" : "opacity-0"
+            isInView ? "opacity-100" : "opacity-0"
           }`}
         >
           <span className="text-zinc-600 font-mono text-sm">
-            // more projects on github
+            more projects on github
           </span>
         </div>
       </div>

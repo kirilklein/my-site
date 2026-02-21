@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 interface ContactLink {
   label: string;
@@ -32,37 +32,20 @@ const contactLinks: ContactLink[] = [
 ];
 
 export default function ContactSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const { ref, isInView, progress } = useScrollReveal<HTMLElement>({ threshold: 0.2 });
 
   return (
     <section
-      ref={sectionRef}
+      ref={ref}
       id="contact"
       className="min-h-screen flex items-center justify-center px-4 py-20"
     >
       <div className="w-full max-w-2xl">
         <div
           className={`transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
+          style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
         >
           {/* Section header */}
           <div className="text-center mb-12">
@@ -92,7 +75,7 @@ export default function ContactSection() {
                   target={link.href.startsWith("mailto") ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className={`block group transition-all duration-500 ${
-                    isVisible
+                    isInView
                       ? "opacity-100 translate-x-0"
                       : "opacity-0 -translate-x-4"
                   }`}
@@ -131,12 +114,12 @@ export default function ContactSection() {
           {/* Footer */}
           <div
             className={`mt-16 text-center text-zinc-600 text-sm font-mono transition-all duration-700 delay-500 ${
-              isVisible ? "opacity-100" : "opacity-0"
+              isInView ? "opacity-100" : "opacity-0"
             }`}
           >
             <p>&copy; {new Date().getFullYear()} Kiril Klein</p>
             <p className="mt-1 text-zinc-700">
-              // built with Next.js + Tailwind
+              built with Next.js + Tailwind
             </p>
           </div>
         </div>

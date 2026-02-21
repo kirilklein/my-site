@@ -1,39 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 export default function AboutSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const { ref, isInView, progress } = useScrollReveal<HTMLElement>({ threshold: 0.2 });
 
   return (
     <section
-      ref={sectionRef}
+      ref={ref}
       id="about"
       className="min-h-screen flex items-center justify-center px-4 py-20"
     >
       <div className="w-full max-w-3xl">
         <div
           className={`terminal-window transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
+          style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
         >
           {/* Terminal header */}
           <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800 rounded-t-lg border-b border-zinc-700">
