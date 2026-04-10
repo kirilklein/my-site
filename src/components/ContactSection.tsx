@@ -43,7 +43,7 @@ export default function ContactSection() {
       <div className="w-full max-w-2xl">
         <div
           className={`transition-all duration-700 ${
-            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isInView ? "opacity-100" : "opacity-0"
           }`}
           style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
         >

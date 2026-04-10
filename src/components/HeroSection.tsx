@@ -1,20 +1,46 @@
 "use client";
 
-import useScrollReveal from "@/hooks/useScrollReveal";
+import { useEffect, useRef, useState } from "react";
 
 export default function HeroSection() {
-  const { ref, progress } = useScrollReveal<HTMLElement>({ threshold: 0.15 });
-  const clamped = Math.min(1, Math.max(0, progress));
-  const titleOffset = clamped * 52;
-  const subtitleOffset = clamped * 28;
-  const contentOpacity = Math.max(0.18, 1 - clamped * 1.15);
-  const gridOpacity = Math.max(0.08, 0.42 - clamped * 0.32);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [progress, setProgress] = useState(0);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const node = sectionRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const raw = -rect.top / (rect.height * 0.6);
+      setProgress(Math.min(1, Math.max(0, raw)));
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(updateProgress);
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const titleOffset = progress * 52;
+  const subtitleOffset = progress * 28;
+  const contentOpacity = Math.max(0.18, 1 - progress * 1.15);
+  const gridOpacity = Math.max(0.08, 0.42 - progress * 0.32);
 
   return (
     <section
-      ref={ref}
+      ref={sectionRef}
       id="home"
-      className="hero-section min-h-screen px-4 pt-28 pb-20 flex items-center"
+      className="hero-section relative min-h-screen px-4 pt-28 pb-20 flex items-center"
     >
       <div className="hero-grid-overlay" style={{ opacity: gridOpacity }} />
       <div className="hero-cinematic-beam" />
@@ -27,7 +53,7 @@ export default function HeroSection() {
         <h1
           className="hero-title hero-reveal-title text-4xl md:text-7xl font-bold tracking-tight text-zinc-100"
           style={{
-            transform: `translateY(${titleOffset}px) scale(${1 - clamped * 0.04})`,
+            transform: `translateY(${titleOffset}px) scale(${1 - progress * 0.04})`,
             opacity: contentOpacity,
           }}
         >
@@ -56,6 +82,22 @@ export default function HeroSection() {
             View Projects
           </a>
         </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        style={{ opacity: Math.max(0, 1 - progress * 3) }}
+      >
+        <svg
+          className="w-6 h-6 text-green-400 animate-bounce"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
       </div>
     </section>
   );

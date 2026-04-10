@@ -21,7 +21,7 @@ export default function useScrollReveal<T extends HTMLElement>({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInView(entry.isIntersecting);
+        if (entry.isIntersecting) setIsInView(true);
       },
       { threshold, rootMargin }
     );
@@ -31,6 +31,8 @@ export default function useScrollReveal<T extends HTMLElement>({
   }, [threshold, rootMargin]);
 
   useEffect(() => {
+    let rafId = 0;
+
     const updateProgress = () => {
       const node = ref.current;
       if (!node) return;
@@ -40,17 +42,22 @@ export default function useScrollReveal<T extends HTMLElement>({
       const start = viewportHeight * 0.9;
       const end = viewportHeight * 0.2;
       const next = (start - rect.top) / (start - end);
-      const clamped = Math.min(1, Math.max(0, next));
-      setProgress(clamped);
+      setProgress(Math.min(1, Math.max(0, next)));
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateProgress);
     };
 
     updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 

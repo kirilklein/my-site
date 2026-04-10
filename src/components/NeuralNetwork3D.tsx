@@ -233,6 +233,14 @@ function NetworkScene() {
     lineGeometry.setAttribute("color", new THREE.BufferAttribute(lineColorBufferRef.current, 3));
   }, [lineGeometry]);
 
+  useEffect(() => {
+    return () => {
+      pulseTexture.dispose();
+      lineGeometry.dispose();
+      pulseGeometry.dispose();
+    };
+  }, [pulseTexture, lineGeometry, pulseGeometry]);
+
   const baseColor = useMemo(() => new THREE.Color("#00ff88"), []);
   const hotColor = useMemo(() => new THREE.Color("#b5ffff"), []);
   const edgeBaseColor = useMemo(() => new THREE.Color("#1f6a52"), []);

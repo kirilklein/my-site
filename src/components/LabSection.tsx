@@ -8,6 +8,8 @@ export default function LabSection() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    let rafId = 0;
+
     const updateProgress = () => {
       const node = sectionRef.current;
       if (!node) return;
@@ -18,12 +20,18 @@ export default function LabSection() {
       setProgress(scrolled / travel);
     };
 
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateProgress);
+    };
+
     updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
@@ -49,9 +57,6 @@ export default function LabSection() {
               <h2 className="text-3xl md:text-5xl font-bold text-zinc-100">
                 Interactive ML Lab
               </h2>
-              <p className="text-zinc-400 mt-3 max-w-2xl">
-                Scroll to power on the monitor and boot the network visualization.
-              </p>
             </div>
 
             <div

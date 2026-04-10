@@ -41,6 +41,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setTimeout(() => setIsVisible(true), index * 150);
+          observer.disconnect();
         }
       },
       { threshold: 0.1 }
@@ -125,7 +126,7 @@ export default function ProjectsSection() {
         {/* Section header */}
         <div
           className={`mb-12 transition-all duration-700 ${
-            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isInView ? "opacity-100" : "opacity-0"
           }`}
           style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
         >

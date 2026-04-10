@@ -236,11 +236,8 @@ export default function CRTTerminal({
 
                   {phase === "standby" && (
                     <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
-                      <div className="text-green-400 terminal-text text-center">
-                        {">"} awaiting scroll signal...
-                      </div>
-                      <div className="text-green-400/60 text-xs font-mono mt-3 text-center">
-                        move down to initialize visualization
+                      <div className="text-green-400 terminal-text">
+                        {">"} <span className="cursor-blink">&#x258A;</span>
                       </div>
                     </div>
                   )}
@@ -253,7 +250,7 @@ export default function CRTTerminal({
         {/* Monitor bottom panel */}
         <div className="monitor-bottom-panel">
           {/* Power LED */}
-          <div className="power-led led-on" />
+          <div className={`power-led ${phase === "standby" ? "led-standby" : "led-on"}`} />
         </div>
       </div>
 

@@ -49,7 +49,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo / Name */}
           <a
-            href="#"
+            href="#home"
             className="font-mono text-green-400 hover:text-green-300 transition-colors"
           >
             <span className="text-green-500">~/</span>kiril
