@@ -4,7 +4,7 @@ test.describe("Homepage", () => {
   test("page loads and hero section is visible", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByText("Kiril Klein")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Kiril Klein" })).toBeVisible();
     await expect(
       page.getByText("Machine Learning Engineer building")
     ).toBeVisible();
@@ -23,7 +23,7 @@ test.describe("Homepage", () => {
     await page.goto("/");
 
     // Scroll to lab section
-    await page.getByRole("link", { name: "lab" }).click();
+    await page.getByRole("link", { name: "lab", exact: true }).click();
     await expect(page.locator(".crt-monitor")).toBeVisible();
     await expect(page.locator(".crt-glass")).toBeVisible();
   });
@@ -54,7 +54,7 @@ test.describe("Navigation", () => {
     await page.goto("/");
 
     await expect(page.getByRole("link", { name: "home" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "lab" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "lab", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "about" })).toBeVisible();
     await expect(page.getByRole("link", { name: "projects" })).toBeVisible();
     await expect(page.getByRole("link", { name: "contact" })).toBeVisible();

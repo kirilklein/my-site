@@ -178,7 +178,8 @@ body {
   .hero-reveal-chip,
   .hero-reveal-title,
   .hero-reveal-subtitle,
-  .hero-reveal-actions {
+  .hero-reveal-actions,
+  .power-led.led-standby {
     animation: none;
   }
 }
