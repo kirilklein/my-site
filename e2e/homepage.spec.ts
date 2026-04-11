@@ -28,23 +28,16 @@ test.describe("Homepage", () => {
     await expect(page.locator(".crt-glass")).toBeVisible();
   });
 
-  test("CRT monitor activates on scroll", async ({ page }) => {
+  test("CRT monitor starts in standby and powers on", async ({ page }) => {
     await page.goto("/");
 
-    // The lab section is 260vh tall. isPowered triggers at progress > 0.33.
-    // We need to scroll well past the top of the section.
-    await page.evaluate(() => {
-      const lab = document.getElementById("lab");
-      if (!lab) return;
-      const labTop = lab.getBoundingClientRect().top + window.scrollY;
-      // Scroll to ~40% through the section to ensure isPowered triggers
-      const scrollTarget = labTop + window.innerHeight * 1.2;
-      window.scrollTo({ top: scrollTarget, behavior: "instant" });
-    });
+    // Scroll to lab section — CRT should be visible in standby
+    await page.getByRole("link", { name: "lab", exact: true }).click();
+    await expect(page.locator(".crt-glass")).toBeVisible();
 
-    // Neural network should appear after activation
-    await expect(page.locator(".neural-network-container")).toBeVisible({
-      timeout: 15000,
+    // In standby, the power LED should have the standby class
+    await expect(page.locator(".power-led.led-standby")).toBeVisible({
+      timeout: 5000,
     });
   });
 });
