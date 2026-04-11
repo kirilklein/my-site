@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 
 const navItems = [
-  { label: "home", href: "#" },
+  { label: "home", href: "#home" },
+  { label: "lab", href: "#lab" },
   { label: "about", href: "#about" },
   { label: "projects", href: "#projects" },
   { label: "contact", href: "#contact" },
@@ -18,7 +19,7 @@ export default function Navigation() {
       setIsScrolled(window.scrollY > 50);
 
       // Determine active section
-      const sections = ["contact", "projects", "about"];
+      const sections = ["contact", "projects", "about", "lab"];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
@@ -48,7 +49,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo / Name */}
           <a
-            href="#"
+            href="#home"
             className="font-mono text-green-400 hover:text-green-300 transition-colors"
           >
             <span className="text-green-500">~/</span>kiril

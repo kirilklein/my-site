@@ -26,13 +26,23 @@ const terminalSequence: TerminalLine[] = [
 
 type Phase = "typing" | "loading" | "network";
 
-export default function CRTTerminal() {
+type ExtendedPhase = Phase | "standby";
+
+interface CRTTerminalProps {
+  mode?: "sequence" | "networkOnActivate";
+  isActive?: boolean;
+}
+
+export default function CRTTerminal({
+  mode = "sequence",
+  isActive = true,
+}: CRTTerminalProps) {
   const [visibleLines, setVisibleLines] = useState<number>(0);
   const [typedChars, setTypedChars] = useState<number>(0);
-  const [currentLineComplete, setCurrentLineComplete] = useState(false);
-  const [phase, setPhase] = useState<Phase>("typing");
+  const [phase, setPhase] = useState<ExtendedPhase>(
+    mode === "networkOnActivate" ? "standby" : "typing"
+  );
   const [loadProgress, setLoadProgress] = useState(0);
-  const [typingComplete, setTypingComplete] = useState(false);
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Cleanup on unmount
@@ -43,6 +53,17 @@ export default function CRTTerminal() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (mode !== "networkOnActivate") return;
+    if (!isActive || phase !== "standby") return;
+
+    const activateTimer = setTimeout(() => {
+      setPhase("network");
+    }, 350);
+
+    return () => clearTimeout(activateTimer);
+  }, [isActive, mode, phase]);
 
   // Start the sequence after mount
   useEffect(() => {
@@ -60,12 +81,7 @@ export default function CRTTerminal() {
     if (visibleLines === 0) return;
 
     // Check if we've completed all lines
-    if (visibleLines > terminalSequence.length) {
-      if (!typingComplete) {
-        setTypingComplete(true);
-      }
-      return;
-    }
+    if (visibleLines > terminalSequence.length) return;
 
     const currentLine = terminalSequence[visibleLines - 1];
 
@@ -78,26 +94,25 @@ export default function CRTTerminal() {
       }, typeSpeed);
 
       return () => clearTimeout(typeTimer);
-    } else if (!currentLineComplete && !transitionTimerRef.current) {
-      setCurrentLineComplete(true);
+    } else if (!transitionTimerRef.current) {
       transitionTimerRef.current = setTimeout(() => {
         transitionTimerRef.current = null;
         setTypedChars(0);
-        setCurrentLineComplete(false);
         setVisibleLines(prev => prev + 1);
       }, 300);
     }
-  }, [typedChars, visibleLines, currentLineComplete, phase, typingComplete]);
+  }, [typedChars, visibleLines, phase]);
 
   // Transition to loading phase after typing completes
   useEffect(() => {
-    if (typingComplete && phase === "typing") {
+    const isTypingComplete = visibleLines > terminalSequence.length;
+    if (isTypingComplete && phase === "typing") {
       const transitionTimer = setTimeout(() => {
         setPhase("loading");
       }, 800);
       return () => clearTimeout(transitionTimer);
     }
-  }, [typingComplete, phase]);
+  }, [visibleLines, phase]);
 
   // Loading bar animation
   useEffect(() => {
@@ -172,7 +187,9 @@ export default function CRTTerminal() {
                       {visibleLines > 0 && visibleLines <= terminalSequence.length && (
                         <div className={`${getLineStyle(terminalSequence[visibleLines - 1].type)} leading-relaxed terminal-text`}>
                           {terminalSequence[visibleLines - 1].text.slice(0, typedChars)}
-                          {!currentLineComplete && <span className="cursor-blink">▊</span>}
+                          {typedChars < terminalSequence[visibleLines - 1].text.length && (
+                            <span className="cursor-blink">▊</span>
+                          )}
                         </div>
                       )}
 
@@ -216,6 +233,14 @@ export default function CRTTerminal() {
                       </div>
                     </div>
                   )}
+
+                  {phase === "standby" && (
+                    <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
+                      <div className="text-green-400 terminal-text">
+                        {">"} <span className="cursor-blink">&#x258A;</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -225,7 +250,7 @@ export default function CRTTerminal() {
         {/* Monitor bottom panel */}
         <div className="monitor-bottom-panel">
           {/* Power LED */}
-          <div className="power-led led-on" />
+          <div className={`power-led ${phase === "standby" ? "led-standby" : "led-on"}`} />
         </div>
       </div>
 

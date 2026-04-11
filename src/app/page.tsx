@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import CRTTerminal from "@/components/CRTTerminal";
+import HeroSection from "@/components/HeroSection";
+import LabSection from "@/components/LabSection";
 import AboutSection from "@/components/AboutSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import ContactSection from "@/components/ContactSection";
@@ -16,10 +17,9 @@ export default function Home() {
     <div className="min-h-screen bg-black">
       <Navigation />
 
-      {/* Hero Section */}
-      <section id="home" className="section px-4 py-16 pt-24">
-        <CRTTerminal />
-      </section>
+      <HeroSection />
+
+      <LabSection />
 
       {/* About Section */}
       <AboutSection />
