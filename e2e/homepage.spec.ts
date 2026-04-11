@@ -31,16 +31,16 @@ test.describe("Homepage", () => {
   test("CRT monitor activates on scroll", async ({ page }) => {
     await page.goto("/");
 
-    // Scroll into the lab section to trigger activation
+    // The lab section is 260vh tall. isPowered triggers at progress > 0.33.
+    // We need to scroll well past the top of the section.
     await page.evaluate(() => {
       const lab = document.getElementById("lab");
-      if (lab) lab.scrollIntoView({ behavior: "instant" });
+      if (!lab) return;
+      const labTop = lab.getBoundingClientRect().top + window.scrollY;
+      // Scroll to ~40% through the section to ensure isPowered triggers
+      const scrollTarget = labTop + window.innerHeight * 1.2;
+      window.scrollTo({ top: scrollTarget, behavior: "instant" });
     });
-
-    // Wait for scroll progress to trigger isPowered
-    await page.waitForTimeout(500);
-    await page.evaluate(() => window.scrollBy(0, window.innerHeight));
-    await page.waitForTimeout(500);
 
     // Neural network should appear after activation
     await expect(page.locator(".neural-network-container")).toBeVisible({
@@ -56,7 +56,7 @@ test.describe("Navigation", () => {
     await expect(page.getByRole("link", { name: "home" })).toBeVisible();
     await expect(page.getByRole("link", { name: "lab", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "about" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "projects" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "projects", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "contact" })).toBeVisible();
   });
 
