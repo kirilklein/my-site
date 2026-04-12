@@ -1,5 +1,10 @@
 "use client";
 
+// Three.js GPU buffers (Float32Array) must be mutated in place during useFrame.
+// This conflicts with react-hooks/immutability which expects useMemo values to
+// be treated as immutable. Disable for this file.
+/* eslint-disable react-hooks/immutability */
+
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -215,23 +220,27 @@ function NetworkScene() {
   const edgeActivationRef = useRef<Float32Array>(new Float32Array(graph.edges.length));
   const waveRef = useRef<WaveState | null>(null);
   const nextWaveAtRef = useRef(0.8);
-  const signalBufferRef = useRef<Float32Array>(new Float32Array(cfg.maxSignals * 3).fill(9999));
-  const lineColorBufferRef = useRef<Float32Array>(new Float32Array(graph.linePositions.length));
+  const signalBuffer = useMemo(
+    () => new Float32Array(cfg.maxSignals * 3).fill(9999),
+    []
+  );
+  const lineColorBuffer = useMemo(
+    () => new Float32Array(graph.linePositions.length),
+    [graph.linePositions.length]
+  );
 
   const pulseTexture = useMemo(() => makeRadialTexture(128), []);
   const lineGeometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(graph.linePositions, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(lineColorBuffer, 3));
     return geo;
-  }, [graph.linePositions]);
-  const pulseGeometry = useMemo(() => new THREE.BufferGeometry(), []);
-
-  useEffect(() => {
-    pulseGeometry.setAttribute("position", new THREE.BufferAttribute(signalBufferRef.current, 3));
-  }, [pulseGeometry]);
-  useEffect(() => {
-    lineGeometry.setAttribute("color", new THREE.BufferAttribute(lineColorBufferRef.current, 3));
-  }, [lineGeometry]);
+  }, [graph.linePositions, lineColorBuffer]);
+  const pulseGeometry = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(signalBuffer, 3));
+    return geo;
+  }, [signalBuffer]);
 
   useEffect(() => {
     return () => {
@@ -329,7 +338,6 @@ function NetworkScene() {
     }
 
     const wave = waveRef.current;
-    const signalBuffer = signalBufferRef.current;
 
     if (wave) {
       const arrived = new Map<number, number>();
@@ -407,16 +415,15 @@ function NetworkScene() {
       const attr = pulsesRef.current.geometry.getAttribute("position") as THREE.BufferAttribute;
       attr.needsUpdate = true;
     }
-    const lineColors = lineColorBufferRef.current;
     for (let edgeIdx = 0; edgeIdx < graph.edgeVertexRanges.length; edgeIdx++) {
       const range = graph.edgeVertexRanges[edgeIdx];
       const intensity = clamp01(edgeActivations[edgeIdx]);
       tmpColor.copy(edgeBaseColor).lerp(edgeHotColor, intensity);
       for (let v = range.start; v < range.start + range.count; v++) {
         const off = v * 3;
-        lineColors[off] = tmpColor.r;
-        lineColors[off + 1] = tmpColor.g;
-        lineColors[off + 2] = tmpColor.b;
+        lineColorBuffer[off] = tmpColor.r;
+        lineColorBuffer[off + 1] = tmpColor.g;
+        lineColorBuffer[off + 2] = tmpColor.b;
       }
     }
     const lineColorAttr = lineGeometry.getAttribute("color") as THREE.BufferAttribute;
