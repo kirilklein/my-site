@@ -48,14 +48,52 @@ export default function AboutSection() {
                 <span className="text-green-500">$</span> cat skills.json
               </div>
 
-              <div className="bg-black/50 rounded p-4 mt-2">
+              <div className="bg-black/50 rounded p-4 mt-2 overflow-x-auto">
                 <pre className="text-sm text-green-300/80">
 {`{
-  "languages": ["Python", "SQL", "R"],
-  "ml_frameworks": ["PyTorch", "TensorFlow", "scikit-learn"],
-  "data": ["Pandas", "Spark", "PostgreSQL"],
-  "tools": ["Docker", "Git", "Linux"],
-  "cloud": ["AWS", "GCP"]
+  "core_areas": [
+    "Machine Learning Engineering",
+    "Applied AI Research",
+    "Causal Inference",
+    "Healthcare Data Science"
+  ],
+  "programming": ["Python", "SQL", "C++", "Bash"],
+  "modeling": [
+    "Deep Learning",
+    "Transformer Models",
+    "Tree-based and Boosted Models",
+    "Representation Learning",
+    "Sequence Modeling"
+  ],
+  "causal_inference": [
+    "Propensity Score Methods",
+    "Matching and Weighting",
+    "Target Trial Emulation",
+    "Time-to-event Analysis"
+  ],
+  "data_and_systems": [
+    "Scalable Data Processing",
+    "Distributed Computing",
+    "Data Pipelines",
+    "Experiment Design and Evaluation",
+    "Reproducible ML Workflows"
+  ],
+  "tools": [
+    "PyTorch",
+    "scikit-learn",
+    "Dask",
+    "PostgreSQL",
+    "Docker",
+    "Git",
+    "Linux",
+    "Azure ML",
+    "GitHub Actions"
+  ],
+  "domains": [
+    "Electronic Health Records",
+    "Pharmacoepidemiology",
+    "Medical AI"
+  ]
 }`}
                 </pre>
               </div>
