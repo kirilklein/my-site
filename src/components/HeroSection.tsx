@@ -90,13 +90,19 @@ export default function HeroSection() {
         style={{ opacity: Math.max(0, 1 - progress * 3) }}
       >
         <svg
+          suppressHydrationWarning
           className="w-6 h-6 text-green-400 animate-bounce"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth={2}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          <path
+            suppressHydrationWarning
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </div>
     </section>
