@@ -83,10 +83,10 @@ export default function ContactSection() {
                 >
                   <div className="flex items-center gap-2 py-2 px-3 rounded hover:bg-green-500/10 transition-colors">
                     <span className="text-green-500">$</span>
-                    <span className="text-green-400 group-hover:text-green-300 transition-colors">
+                    <span className="min-w-0 flex-1 truncate text-green-400 group-hover:text-green-300 transition-colors">
                       {link.command}
                     </span>
-                    <span className="text-zinc-600 ml-auto text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="hidden md:inline text-zinc-600 ml-auto text-sm opacity-0 group-hover:opacity-100 transition-opacity">
                       [{link.label}]
                     </span>
                   </div>

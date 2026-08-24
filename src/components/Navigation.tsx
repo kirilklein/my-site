@@ -50,18 +50,18 @@ export default function Navigation() {
           {/* Logo / Name */}
           <a
             href="#home"
-            className="font-mono text-green-400 hover:text-green-300 transition-colors"
+            className="hidden sm:block font-mono text-green-400 hover:text-green-300 transition-colors"
           >
             <span className="text-green-500">~/</span>kiril
           </a>
 
           {/* Nav links */}
-          <div className="flex items-center gap-1 font-mono text-sm">
+          <div className="flex items-center gap-0 md:gap-1 font-mono text-xs md:text-sm mx-auto sm:mx-0">
             {navItems.map((item, index) => (
               <span key={item.label} className="flex items-center">
                 <a
                   href={item.href}
-                  className={`px-3 py-1 rounded transition-colors ${
+                  className={`px-2 md:px-3 py-1 rounded transition-colors ${
                     activeSection === item.label
                       ? "text-green-300 bg-green-500/10"
                       : "text-zinc-500 hover:text-green-400"
@@ -70,7 +70,7 @@ export default function Navigation() {
                   {item.label}
                 </a>
                 {index < navItems.length - 1 && (
-                  <span className="text-zinc-700">/</span>
+                  <span className="hidden md:inline text-zinc-700">/</span>
                 )}
               </span>
             ))}
