@@ -1,6 +1,7 @@
 "use client";
 
 import useScrollReveal from "@/hooks/useScrollReveal";
+import { profile } from "@/data/profile";
 
 export default function AboutSection() {
   const { ref, isInView, progress } = useScrollReveal<HTMLElement>({ threshold: 0.2 });
@@ -33,15 +34,12 @@ export default function AboutSection() {
             </div>
 
             <div className="text-green-300/90 space-y-4 leading-relaxed">
-              <p>
-                I&apos;m a Machine Learning Engineer and Data Scientist passionate
-                about building intelligent systems that solve real-world problems.
-              </p>
+              {profile.bio.map((paragraph) => (
+                <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+              ))}
 
-              <p>
-                My work spans the full ML lifecycle: from exploratory data analysis
-                and feature engineering to model development, optimization, and
-                deployment at scale.
+              <p className="text-green-400/70 text-sm">
+                PhD dissertation: &ldquo;{profile.dissertation}&rdquo;
               </p>
 
               <div className="mt-6 text-green-400">
@@ -50,51 +48,7 @@ export default function AboutSection() {
 
               <div className="bg-black/50 rounded p-4 mt-2 overflow-x-auto">
                 <pre className="text-sm text-green-300/80">
-{`{
-  "core_areas": [
-    "Machine Learning Engineering",
-    "Applied AI Research",
-    "Causal Inference",
-    "Healthcare Data Science"
-  ],
-  "programming": ["Python", "SQL", "C++", "Bash"],
-  "modeling": [
-    "Deep Learning",
-    "Transformer Models",
-    "Tree-based and Boosted Models",
-    "Representation Learning",
-    "Sequence Modeling"
-  ],
-  "causal_inference": [
-    "Propensity Score Methods",
-    "Matching and Weighting",
-    "Target Trial Emulation",
-    "Time-to-event Analysis"
-  ],
-  "data_and_systems": [
-    "Scalable Data Processing",
-    "Distributed Computing",
-    "Data Pipelines",
-    "Experiment Design and Evaluation",
-    "Reproducible ML Workflows"
-  ],
-  "tools": [
-    "PyTorch",
-    "scikit-learn",
-    "Dask",
-    "PostgreSQL",
-    "Docker",
-    "Git",
-    "Linux",
-    "Azure ML",
-    "GitHub Actions"
-  ],
-  "domains": [
-    "Electronic Health Records",
-    "Pharmacoepidemiology",
-    "Medical AI"
-  ]
-}`}
+                  {JSON.stringify(profile.skills, null, 2)}
                 </pre>
               </div>
             </div>

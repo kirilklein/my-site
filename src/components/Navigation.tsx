@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 
 const navItems = [
   { label: "home", href: "#home" },
-  { label: "lab", href: "#lab" },
   { label: "about", href: "#about" },
   { label: "projects", href: "#projects" },
+  { label: "lab", href: "#lab" },
   { label: "contact", href: "#contact" },
 ];
 
@@ -19,7 +19,7 @@ export default function Navigation() {
       setIsScrolled(window.scrollY > 50);
 
       // Determine active section
-      const sections = ["contact", "projects", "about", "lab"];
+      const sections = ["contact", "lab", "projects", "about"];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {

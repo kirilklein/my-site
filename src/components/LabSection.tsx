@@ -40,7 +40,7 @@ export default function LabSection() {
   const isPowered = progress > 0.33;
 
   return (
-    <section ref={sectionRef} id="lab" className="lab-scroll-section relative h-[260vh]">
+    <section ref={sectionRef} id="lab" className="lab-scroll-section relative h-[130vh]">
       <div className="lab-sticky-stage sticky top-0 h-screen px-4">
         <div className="w-full h-full max-w-5xl mx-auto flex items-center">
           <div className="w-full">
