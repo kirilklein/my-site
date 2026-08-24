@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { profile } from "@/data/profile";
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -47,7 +48,7 @@ export default function HeroSection() {
       <div className="hero-vignette" />
       <div className="w-full max-w-4xl mx-auto relative z-10">
         <div className="hero-chip hero-reveal-chip font-mono text-xs md:text-sm mb-6">
-          <span className="text-green-500">$</span> portfolio.boot --fast
+          <span className="text-green-500">$</span> whoami
         </div>
 
         <h1
@@ -57,7 +58,7 @@ export default function HeroSection() {
             opacity: contentOpacity,
           }}
         >
-          Kiril Klein
+          {profile.name}
         </h1>
 
         <p
@@ -67,19 +68,38 @@ export default function HeroSection() {
             opacity: Math.max(0.15, contentOpacity - 0.1),
           }}
         >
-          Machine Learning Engineer building production-grade AI systems,
-          data platforms, and applied research tools.
+          {profile.tagline}
         </p>
+
+        {/* Proof strip */}
+        <div
+          className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-sm"
+          style={{ opacity: Math.max(0.1, contentOpacity - 0.15) }}
+        >
+          {profile.proof.map((item, index) => (
+            <span key={item.label} className="flex items-center gap-4">
+              {index > 0 && <span className="text-zinc-700">·</span>}
+              <a
+                href={item.href}
+                target={item.href.startsWith("/") ? undefined : "_blank"}
+                rel="noopener noreferrer"
+                className="text-green-400/80 hover:text-green-300 transition-colors"
+              >
+                {item.label}
+              </a>
+            </span>
+          ))}
+        </div>
 
         <div
           className="hero-reveal-actions mt-10 flex items-center gap-4"
           style={{ opacity: Math.max(0.1, contentOpacity - 0.22) }}
         >
-          <a href="#lab" className="hero-cta">
-            Enter Lab
-          </a>
-          <a href="#projects" className="hero-cta-secondary">
+          <a href="#projects" className="hero-cta">
             View Projects
+          </a>
+          <a href="#lab" className="hero-cta-secondary">
+            Enter Lab
           </a>
         </div>
       </div>

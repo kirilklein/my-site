@@ -19,15 +19,12 @@ export default function Home() {
 
       <HeroSection />
 
-      <LabSection />
-
-      {/* About Section */}
       <AboutSection />
 
-      {/* Projects Section */}
       <ProjectsSection />
 
-      {/* Contact Section */}
+      <LabSection />
+
       <ContactSection />
     </div>
   );

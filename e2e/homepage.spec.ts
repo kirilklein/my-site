@@ -4,19 +4,28 @@ test.describe("Homepage", () => {
   test("page loads and hero section is visible", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: "Kiril Klein" })).toBeVisible();
     await expect(
-      page.getByText("Machine Learning Engineer building")
+      page.getByRole("heading", { name: "Kiril Klein, PhD" })
+    ).toBeVisible();
+    await expect(
+      page.locator("#home").getByText("Machine Learning Engineer with a PhD")
     ).toBeVisible();
   });
 
   test("hero CTA buttons are visible", async ({ page }) => {
     await page.goto("/");
 
+    await expect(page.getByRole("link", { name: "View Projects" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Enter Lab" })).toBeVisible();
+  });
+
+  test("hero proof links are visible", async ({ page }) => {
+    await page.goto("/");
+
     await expect(
-      page.getByRole("link", { name: "View Projects" })
+      page.getByRole("link", { name: "CORE-BEHRT (PMLR 2024)" })
     ).toBeVisible();
+    await expect(page.getByRole("link", { name: "CV", exact: true })).toBeVisible();
   });
 
   test("CRT monitor is visible in lab section", async ({ page }) => {
@@ -40,6 +49,15 @@ test.describe("Homepage", () => {
       timeout: 5000,
     });
   });
+
+  test("projects section shows selected work", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("link", { name: "projects", exact: true }).click();
+    const projects = page.locator("#projects");
+    await expect(projects.getByText("BONSAI", { exact: true })).toBeVisible();
+    await expect(projects.getByText("CORE-BEHRT", { exact: true })).toBeVisible();
+  });
 });
 
 test.describe("Navigation", () => {
@@ -47,9 +65,9 @@ test.describe("Navigation", () => {
     await page.goto("/");
 
     await expect(page.getByRole("link", { name: "home" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "lab", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "about" })).toBeVisible();
     await expect(page.getByRole("link", { name: "projects", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "lab", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "contact" })).toBeVisible();
   });
 

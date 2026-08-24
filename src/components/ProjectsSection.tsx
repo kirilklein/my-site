@@ -2,35 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import useScrollReveal from "@/hooks/useScrollReveal";
-
-interface Project {
-  name: string;
-  description: string;
-  tech: string[];
-  link?: string;
-  github?: string;
-}
-
-const projects: Project[] = [
-  {
-    name: "CORE-BEHRT",
-    description: "Transformer-based framework for modeling large-scale electronic health records data",
-    tech: ["PyTorch", "Transformers", "EHR"],
-    github: "https://github.com/FGA-DIKU/EHR",
-  },
-  {
-    name: "CausalEstimate",
-    description: "Open-source library for treatment effect estimation from propensity scores",
-    tech: ["Python", "Causal Inference", "Statistics"],
-    github: "https://github.com/kirilklein/CausalEstimate",
-  },
-  {
-    name: "PHAIR-EHR",
-    description: "Causal inference pipelines built on CORE-BEHRT for healthcare research",
-    tech: ["PyTorch", "Causal ML", "Healthcare"],
-    github: "https://github.com/kirilklein/PHAIR_EHR",
-  },
-];
+import { profile, type Project } from "@/data/profile";
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -87,9 +59,23 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
         {/* Links */}
         <div className="flex gap-4 text-sm">
+          {project.paper && (
+            <a
+              href={project.paper}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-500 hover:text-green-400 transition-colors flex items-center gap-1"
+            >
+              <span>[</span>
+              <span>paper</span>
+              <span>]</span>
+            </a>
+          )}
           {project.github && (
             <a
               href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-zinc-500 hover:text-green-400 transition-colors flex items-center gap-1"
             >
               <span>[</span>
@@ -100,6 +86,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           {project.link && (
             <a
               href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-zinc-500 hover:text-green-400 transition-colors flex items-center gap-1"
             >
               <span>[</span>
@@ -134,16 +122,16 @@ export default function ProjectsSection() {
             <span className="text-green-500">$</span> ls -la ~/projects/
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-green-300">
-            Projects
+            Selected Work
           </h2>
           <p className="text-zinc-500 mt-2 font-mono text-sm">
-            selected works and experiments
+            research and open-source contributions
           </p>
         </div>
 
         {/* Project grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, index) => (
+        <div className="grid md:grid-cols-2 gap-6">
+          {profile.projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} />
           ))}
         </div>

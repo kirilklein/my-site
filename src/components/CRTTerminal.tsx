@@ -21,7 +21,7 @@ const terminalSequence: TerminalLine[] = [
   { text: "> whoami", type: "command" },
   { text: "", type: "output" },
   { text: "KIRIL KLEIN", type: "title" },
-  { text: "ML Engineer & Data Scientist", type: "subtitle" },
+  { text: "Machine Learning Engineer", type: "subtitle" },
 ];
 
 type Phase = "typing" | "loading" | "network";

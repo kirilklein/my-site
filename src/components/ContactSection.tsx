@@ -21,7 +21,7 @@ const contactLinks: ContactLink[] = [
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/kiril-klein-574809211/",
+    href: "https://www.linkedin.com/in/kiril-klein-phd-574809211/",
     command: "open linkedin.com/in/kiril-klein",
   },
   {
