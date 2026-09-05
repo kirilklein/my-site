@@ -122,5 +122,12 @@ export const profile = {
       paper: "https://doi.org/10.1056/AIra2501253",
       github: "https://github.com/Medical-Event-Data-Standard",
     },
+    {
+      name: "Scar",
+      description:
+        "Claude Code plugin that turns CI failures and human review feedback into checks for future reviews — so your coding agent doesn't make the same mistake twice",
+      tech: ["Claude Code", "Developer Tools", "Code Review"],
+      github: "https://github.com/kirilklein/scar",
+    },
   ] as Project[],
 };
